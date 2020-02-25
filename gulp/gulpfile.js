@@ -7,13 +7,23 @@ const uglify = require('gulp-uglify');
 const cleanCss = require('gulp-clean-css');
 const sourcemaps = require('gulp-sourcemaps');
 const del = require('del');
+const imagemin = require('gulp-imagemin');
+const cache = require('gulp-cache');
 
 const css = [     
-    './src/styles/*.scss',    
+    './src/styles/*.+(scss|sass|css)',    
 ];
 
 const js = [        
     './src/scripts/*.js'
+];
+
+const img = [
+    './src/img/*.+(jpg|png|jpeg|svg)',    
+];
+
+const fonts = [
+    './src/fonts/*',   
 ];
 
 gulp.task('styles', function() {
@@ -43,6 +53,17 @@ gulp.task('scripts', function() {
         .pipe(gulp.dest('./build/js'));
 });
 
+gulp.task('images', function() {
+    return gulp.src(img)
+        .pipe(cache(imagemin()))
+        .pipe(gulp.dest('./build/images'))
+})
+
+gulp.task('fonts', function() {
+    return gulp.src(fonts)
+        .pipe(gulp.dest('./build/fonts'))
+})
+
 gulp.task('watch', function() {
     gulp.watch(css, gulp.series('styles'));
     gulp.watch(js, gulp.series('scripts'));
@@ -54,7 +75,7 @@ function clean() {
 
 gulp.task('build', 
     gulp.series(clean,
-        gulp.parallel('scripts', 'styles'))
+        gulp.parallel('scripts', 'styles', 'images', 'fonts'))
 );
 
 gulp.task('dev', 
